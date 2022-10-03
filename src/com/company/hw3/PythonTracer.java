@@ -69,6 +69,7 @@ public class PythonTracer {
                                 codeBlocks.peek().getBlockComplexity().setnPower(0);
                                 codeBlocks.peek().getBlockComplexity().setLogPower(0);
                             }
+                        }
 
                             if (!keyword.equals("for") & !keyword.equals("while"))
                                 codeBlocks.push(new CodeBlock("1",
@@ -80,7 +81,6 @@ public class PythonTracer {
                     } else
                         data = reader.readLine();
                 }
-            }
 
             while(codeBlocks.size() > 1) {
                 CodeBlock oldTop = codeBlocks.pop();
