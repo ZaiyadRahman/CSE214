@@ -40,7 +40,8 @@ public class PythonTracer {
             }
             Complexity complexity = traceFile(userInput);
             String fnName = userInput.split("\\.")[0];
-            System.out.println("Overall complexity of " + fnName + " is " + complexity.toString());
+            System.out.println("Overall complexity of " + fnName + " is " +
+                    complexity.toString());
         } while (true);
         System.out.println("Program terminating successfully...\n");
         System.exit(0);
@@ -83,15 +84,18 @@ public class PythonTracer {
                             Complexity oldTopComplexity =
                                     oldTop.getTotalComplexity();
                             //Test CompareComplexity()
-                            if (oldTop.compareComplexity(codeBlocks.peek().getHighestSubComplexity())) {
-                                codeBlocks.peek().setHighestSubComplexity(oldTopComplexity);
+                            if (oldTop.compareComplexity(
+                                    codeBlocks.peek().getHighestSubComplexity())) {
+                                codeBlocks.peek().
+                                        setHighestSubComplexity(oldTopComplexity);
                                 System.out.println("Leaving block " +
                                         oldTop.getName() + ", updating block " +
                                         codeBlocks.peek().getName());
                                 System.out.println(codeBlocks.peek());
                             }
                             else {
-                                System.out.println("Leaving block " + oldTop.getName() + ", nothing to update.");
+                                System.out.println("Leaving block " +
+                                        oldTop.getName() + ", nothing to update.");
                                 System.out.println(codeBlocks.peek().toString());
                             }
                         }
@@ -112,7 +116,8 @@ public class PythonTracer {
                         }
                         String[] tokens = line.trim().split(" ");
                         String keyword = tokens[0];
-                        System.out.println("Entering block " + newName + " '" + keyword + "':");
+                        System.out.println("Entering block " + newName + " '" +
+                                keyword + "':");
                         CodeBlock newBlock;
                         switch (keyword) {
 
@@ -127,7 +132,8 @@ public class PythonTracer {
                                     newBlock.getBlockComplexity().setLogPower(1);
                                 else
                                     newBlock.getBlockComplexity().setnPower(1);
-                                newBlock.setTotalComplexity(newBlock.getBlockComplexity());
+                                newBlock.setTotalComplexity(
+                                        newBlock.getBlockComplexity());
                                 codeBlocks.push(newBlock);
                             }
                             case "while" -> {
@@ -196,7 +202,7 @@ public class PythonTracer {
         } catch (IOException e) {
             System.out.println("File has no more lines.");
         }
-        return codeBlocks.pop().getTotalComplexity();
+        return codeBlocks.pop().getHighestSubComplexity();
     }
 
     /**

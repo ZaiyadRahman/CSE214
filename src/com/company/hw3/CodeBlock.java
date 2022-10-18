@@ -236,7 +236,9 @@ public class CodeBlock {
      */
     @Override
     public String toString() {
-//        BLOCK 1.2:     block complexity = O(log(n))  highest sub-complexity = O(1)
-               return "BLOCK " + getName() + "     block complexity = " + getBlockComplexity().toString() + " highest sub-complexity = " + getHighestSubComplexity().toString();
+               return "BLOCK " + getName() + "     block complexity = " +
+                       getBlockComplexity().toString() +
+                       " highest sub-complexity = " +
+                       getHighestSubComplexity().toString();
     }
 }
