@@ -16,7 +16,7 @@ public class TrainCar extends ProductLoad {
     private final double carLength;
     private final double carWeight;
     private ProductLoad load;
-    private double totalWeight;
+    private final double totalWeight;
 
     /**
      * Default constructor that creates an empty TrainCar object.

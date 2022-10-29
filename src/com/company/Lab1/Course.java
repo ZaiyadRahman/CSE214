@@ -186,9 +186,9 @@ public class Course implements Cloneable {
      * typecasted to a Course before it can be used.
      */
     public Object clone() {
-        String clonedCourseName = new String(getCourseName());
-        String clonedDepartment = new String(getDepartment());
-        String clonedInstructor = new String(getInstructor());
+        String clonedCourseName = getCourseName();
+        String clonedDepartment = getDepartment();
+        String clonedInstructor = getInstructor();
         return new Course( clonedCourseName, clonedDepartment, clonedInstructor, getCode(), getSection());
     }
 
