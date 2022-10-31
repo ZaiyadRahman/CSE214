@@ -10,6 +10,7 @@
 package com.company.hw4;
 
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 public class Router extends LinkedList<Packet> {
     int maxBuffer;
@@ -22,6 +23,7 @@ public class Router extends LinkedList<Packet> {
      */
     public Router(int maxBuffer, int id) {
         this.maxBuffer = maxBuffer;
+        this.id = id;
 
     }
 
@@ -67,13 +69,16 @@ public class Router extends LinkedList<Packet> {
      */
     public static int sendPacketTo(Router[] routers) throws FullBufferException {
         int indexOfLeastFullRouter = -1;
-        int minNumPackets = maxBuffer;
+        int minNumPackets = Integer.MAX_VALUE;
+
         for (int i = 0; i < routers.length; i++) {
-            if (routers[i].size() < minNumPackets) {
-                minNumPackets = routers[i].size();
+            Router rt = routers[i];
+            if (!rt.isFull() && rt.size() < minNumPackets) {
+                minNumPackets = rt.size();
                 indexOfLeastFullRouter = i;
             }
         }
+
         if (indexOfLeastFullRouter == -1) {
             throw new FullBufferException();
         }
@@ -111,17 +116,9 @@ public class Router extends LinkedList<Packet> {
      * {[packet1], [packet2], ... , [packetN]}
      */
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("{");
-        if(!this.isEmpty()) {
-            for (int i = 0; i < this.size() - 2; i++) {
-                stringBuilder.append(this.get(i).toString()).append(", ");
-            }
-            if (!this.isEmpty())
-                stringBuilder.append(this.getLast().toString()).append("}");
-        }
-        else
-            stringBuilder.append(" }");
-        return stringBuilder.toString();
+
+        return String.format("{%s}", String.join(", ",
+                this.stream().map(p -> p.toString()).collect(Collectors.toList())));
     }
 
 

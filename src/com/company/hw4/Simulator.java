@@ -39,17 +39,17 @@ public class Simulator {
 
             try {
                 System.out.println("Enter the number of Intermediate routers: ");
-                numIntRouters = input.nextInt();
+                sim.setNumIntRouters(input.nextInt());
                 System.out.println("Enter the arrival probability of a packet: ");
-                arrivalProb = input.nextDouble();
+                sim.setArrivalProb(input.nextDouble());
                 System.out.println("Enter the maximum buffer size of a router: ");
-                maxBufferSize = input.nextInt();
+                sim.setMaxBufferSize(input.nextInt());
                 System.out.println("Enter the minimum size of a packet: ");
-                minPacketSize = input.nextInt();
+                sim.setMinPacketSize(input.nextInt());
                 System.out.println("Enter the maximum size of a packet: ");
-                maxPacketSize = input.nextInt();
+                sim.setMaxPacketSize(input.nextInt());
                 System.out.println("Enter the bandwidth size: ");
-                bandwidth = input.nextInt();
+                sim.setBandwidth(input.nextInt());
                 System.out.println("Enter the simulation duration: ");
                 sim.setDuration(input.nextInt());
             } catch (InputMismatchException e) {
@@ -78,7 +78,7 @@ public class Simulator {
             // confirm repeat
             System.out.println("Do you want to try another simulation? (y/n):" +
                     " ");
-            choice = input.nextLine();
+            choice = input.next();
 
         } while (!choice.equalsIgnoreCase("n"));
 
@@ -148,7 +148,7 @@ public class Simulator {
         Router dispatch = new Router(MAX_PACKETS, -1);
         Router[] routers = new Router[getNumIntRouters()];
         for (int i = 0; i < routers.length; i++) {
-            routers[i] = new Router(maxBufferSize);
+            routers[i] = new Router(maxBufferSize, i);
         }
         int currentTime = 0;
         int usedBandwidth = 0;
@@ -169,7 +169,7 @@ public class Simulator {
                     packetsCreated++;
                 }
             }
-            if(packetsCreated == 0)
+            if (packetsCreated == 0)
                 System.out.println("No packets arrived.");
 
             //As long as the dispatcher has packets, tries to send them to
@@ -177,19 +177,18 @@ public class Simulator {
             if (!dispatch.isEmpty()) {
                 while (dispatch.size() > 0) {
                     Packet packet = dispatch.dequeue();
-                    int routerIndex = 0;
                     try {
                         // Identify the least "full" router that has capacity
                         // for another packet
-                        routerIndex = Router.sendPacketTo(routers, maxBufferSize);
+                        int routerIndex = Router.sendPacketTo(routers);
+                        System.out.println("Packet " + packet.getId() + " sent " +
+                                "to router " + routerIndex + ".");
+                        routers[routerIndex].enqueue(packet);
                     } catch (FullBufferException e) {
                         System.out.println("Network is congested. Packet " + packet.getId() +
                                 " is dropped.");
                         setPacketsDropped(getPacketsDropped() + 1);
                     }
-                    System.out.println("Packet " + packet.getId() + " sent " +
-                            "to router " + routerIndex + ".");
-                    routers[routerIndex].enqueue(packet);
                 }
             }
 
