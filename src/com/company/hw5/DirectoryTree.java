@@ -1,29 +1,59 @@
+/**
+ * This <code>DirectoryTree</code> class implements a 10-ary tree of
+ * DirectoryNodes. The class contains a reference to the root of the tree, a
+ * cursor for the present working directory, and various methods for
+ * insertion and deletion.
+ *
+ * @author Zaiyad Munair Rahman
+ * SBU ID: 114578879
+ * CSE 214.01
+ */
+
 package com.company.hw5;
 
 public class DirectoryTree {
 
     private final DirectoryNode root;
     private DirectoryNode cursor;
+    private final int INDENT = 4;
 
+    /**
+     * Default constructor for the DirectoryTree class.
+     */
     public DirectoryTree() {
         this.root = new DirectoryNode("root", false, null);
         this.cursor = root;
     }
 
+    /**
+     * Resets the cursor to the root of the tree.
+     */
     public void resetCursor() {
         this.cursor = root;
     }
 
+    /**
+     * Moves the cursor to the child of the current cursor with the given name.
+     * @param path
+     * The name or absolute path of the child to move the cursor to.
+     * @throws NotADirectoryException
+     * Thrown if the cursor is not a directory.
+     */
     public void changeDirectory(String path) throws NotADirectoryException {
         DirectoryNode found = findNode(path);
         if (found == null) {
-            System.out.println("ERROR: No such directory named " + path + ".");
+            System.out.println("ERROR: No such directory named " + path + " " +
+                    "under the current directory. Please try again.");
         } else if (found.isFile()) {
             throw new NotADirectoryException();
         } else {
             this.cursor = found;
         }
     }
+
+    /**
+     * Moves the cursor to the parent of the current cursor.
+     */
 
     public void changeDirectoryToParent() {
         DirectoryNode parent = cursor.getParent();
@@ -34,18 +64,34 @@ public class DirectoryTree {
         }
     }
 
+    /**
+     * Finds the node with the given name or absolute path.
+     * @param path
+     * The name or absolute path of the node to be found.
+     * @return
+     * The node with the given name or absolute path.
+     */
     public DirectoryNode findNode(String path) {
         return findNode(cursor, path);
     }
 
+    /**
+     * Finds the node with the given name or absolute path.
+     * @param node
+     * The node to start searching from.
+     * @param path
+     * The name or absolute path of the node to be found.
+     * @return
+     * The node with the given name or absolute path.
+     */
     public DirectoryNode findNode(DirectoryNode node, String path) {
         if (node.getName().equals(path)) {
             return node;
         } else if (node.isFile()) {
             return null;
         } else if (!path.contains("/")) {
-            for (DirectoryNode child : node.getChildren()) {
-                DirectoryNode found = findNode(child, path);
+            for (int i = 0; i < node.getNumChildren(); i++) {
+                DirectoryNode found = findNode(node.getChild(i), path);
                 if (found != null) {
                     return found;
                 }
@@ -55,7 +101,7 @@ public class DirectoryTree {
 //            split into two parts - the "parent-most" segment/dir and the rest of the path
             String[] split = path.split("/", 2);
 //            see if any children of the current node match the "parent-most"
-//            segment - if so, that means we're getting warmer!
+//            segment
 //            thus, recurse on that child with the rest of the path
             for (DirectoryNode child : node.getChildren()) {
                 if (child.getName().equals(split[0])) {
@@ -66,50 +112,84 @@ public class DirectoryTree {
         }
     }
 
+    /**
+     * Finds the node given the name of the node starting at the root of the
+     * tree.
+     * @param name
+     * The name of the node to be found.
+     * @return
+     * The node with the given name.
+     */
     public DirectoryNode search(String name) {
         return searchHelper(root, name);
     }
 
+    /**
+     * Finds the node given the name of the node to be found, starting at a
+     * given node.
+     * @param node
+     * The node to start searching from.
+     * @param name
+     * The name of the node to be found.
+     * @return
+     * The node with the given name.
+     */
     public DirectoryNode searchHelper(DirectoryNode node, String name) {
         if (node.getName().equals(name)) {
             return node;
         } else if (!node.isFile()) {
-            for (DirectoryNode child : node.getChildren()) {
-                return searchHelper(child, name);
+            for (int i = 0; i < node.getNumChildren(); i++) {
+                return searchHelper(node.getChild(i), name);
             }
         }
         return null;
     }
 
-    /*
-     public String presentWorkingDirectory()
-     Returns a String containing the path of directory names from the root
-     node of the tree to the cursor, with each name separated by a forward
-     slash "/".
-     ***The cursor remains at the same DirectoryNode.***
-    */
+    /**
+     * Returns a String containing the path of directory names from the root
+     * node of the tree to the cursor, with each name separated by a forward
+     * slash "/".
+     * @return
+     * The path of directory names from the root node of the tree to the
+     * cursor.
+     */
     public String presentWorkingDirectory() {
         return getFullPath(cursor);
     }
 
+    /**
+     * Returns a String containing the path of directory names from the root
+     * node of the tree to the given node, with each name separated by a
+     * forward slash "/".
+     * @param node
+     * The node to get the path of.
+     * @return
+     * The path of directory names from the root node of the tree to the
+     * given node.
+     */
     public String getFullPath(DirectoryNode node) {
         StringBuilder path = new StringBuilder(node.getName());
         DirectoryNode temp = node;
         while (temp != root) {
             temp = temp.getParent();
+            if(!temp.isFile())
             path = new StringBuilder(temp.getName() + ("/" + path));
+            else
+                path = new StringBuilder(temp.getName() + path);
         }
         return path.toString();
     }
 
 
-    /*
-       public String listDirectory()
-       Returns a String containing a space-separated list of names of all the
-       child directories or files of the cursor.
-       e.g. dev home bin if the cursor is at root in the example above.
-       ***The cursor remains at the same DirectoryNode.***
-        */
+    /**
+     * Returns a String containing a space-separated list of names of all the
+     * child directories or files of the cursor.
+     * e.g. dev home bin if the cursor is at root in the example above. The
+     * cursor remains at the same DirectoryNode.
+     * @return
+     * A space-separated string of names of all the child directories or files
+     * of the cursor.
+     */
     public String listDirectory() {
         StringBuilder list = new StringBuilder();
         for (int i = 0; i < cursor.getNumChildren(); i++) {
@@ -118,48 +198,53 @@ public class DirectoryTree {
         return list.toString();
     }
 
-    /*
-    Prints a formatted nested list of names of all the nodes in the directory tree, starting from the cursor.
-    The cursor remains at the same DirectoryNode.
-    Prints in the following format:
-    |- root
-    |- dev
-        - ttys0
-        - ttys1
-    |- home
-        |- user
-            |- Documents
-                - hw5.java
-                - resume.pdf
-            |- Pictures
-                - puppies.jpg
-            |- Downloads
-    |- bin
-        - sublime
-        - gcc
+    /**
+     * Prints a formatted nested list of names of all the nodes in the
+     * directory tree, starting from the cursor. The cursor remains at the
+     * same DirectoryNode.
      */
     public void printDirectoryTree() {
         DirectoryNode temp = cursor;
         printDirectoryTreeHelper(temp);
     }
 
+    /**
+     * Prints a formatted nested list of names of all the nodes in the
+     * directory tree, starting from the given node. The cursor remains at
+     * the same DirectoryNode.
+     * @param temp
+     * The node to start printing from.
+     */
     private void printDirectoryTreeHelper(DirectoryNode temp) {
-        // pre-order traversal
-        // print *ROOT* first
+
         if (temp.isFile()) {
-            System.out.println("- " + temp.getName());
+            for (int i = 0; i < temp.getDepth(); i++) {
+                System.out.print("    ");
+            }
+                System.out.println("- " + temp.getName());
         } else {
+            for (int i = 0; i < temp.getDepth(); i++) {
+                System.out.print("    ");
+            }
             System.out.println("|- " + temp.getName());
 
-            if (temp.getNumChildren() == 0) {
-                for (DirectoryNode child :
-                        temp.getChildren()) {
-                    printDirectoryTreeHelper(child);
+            if (temp.getNumChildren() != 0) {
+                for (int i = 0; i < temp.getNumChildren(); i++) {
+                    printDirectoryTreeHelper(temp.getChild(i));
                 }
             }
         }
     }
 
+    /**
+     * Creates a file as a child of the current cursor node.
+     * @param name
+     * The name of the file to be created.
+     * @throws FullDirectoryException
+     * Thrown if the cursor node is full.
+     * @throws IllegalArgumentException
+     * Thrown if the name contains a forward slash "/" or a space " ".
+     */
     public void makeFile(String name) throws FullDirectoryException,
             IllegalArgumentException {
         if (name.contains(" ") || name.contains("/"))
@@ -171,6 +256,15 @@ public class DirectoryTree {
         }
     }
 
+    /**
+     * Creates a directory as a child of the current cursor node.
+     * @param name
+     * The name of the directory to be created.
+     * @throws IllegalArgumentException
+     * Thrown if the name contains a forward slash "/" or a space " ".
+     * @throws FullDirectoryException
+     * Thrown if the cursor node is full.
+     */
     public void makeDirectory(String name) throws IllegalArgumentException,
             FullDirectoryException {
         if (name.contains(" ") || name.contains("/"))
@@ -182,6 +276,13 @@ public class DirectoryTree {
         }
     }
 
+    /**
+     * Moves the source node to another destination node.
+     * @param src
+     * The node to be moved.
+     * @param dst
+     * The node to move the source node into.
+     */
     public void moveNode(String src, String dst) {
         DirectoryNode srcNode = findNode(root, src);
         DirectoryNode dstNode = findNode(root, dst);
@@ -201,7 +302,9 @@ public class DirectoryTree {
         }
     }
 
-
+    public DirectoryNode getRoot() {
+        return root;
+    }
 }
 
 
