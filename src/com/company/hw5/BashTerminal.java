@@ -77,16 +77,27 @@ public class BashTerminal {
                         }
                         case "/": {
                             directoryTree.resetCursor();
+                            break;
                         }
                         default: {
-                            if (tokens[1].contains("/")) {
-                                // EXTRA
+                            if (!tokens[1].startsWith("/") & tokens[1].contains(
+                                    "/")) {
+                                String[] absPath = tokens[1].split("/");
+                                try {
+                                    for (String s : absPath) {
+                                        directoryTree.changeDirectory(s);
+                                    }
+                                }
+                                catch (NotADirectoryException e) {
+                                    System.out.println("Directory not found.");
+                                }
 
                             } else {
                                 try {
                                     directoryTree.changeDirectory(arg);
                                 } catch (NotADirectoryException e) {
-                                    System.out.println("ERROR: Cannot change directory into a file.");
+                                    System.out.println("ERROR: Cannot change " +
+                                            "directory into a file.");
                                 }
                             }
                         }

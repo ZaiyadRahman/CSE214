@@ -83,8 +83,13 @@ public class DirectoryNode {
      * The child to be removed.
      */
     public void removeChild(DirectoryNode child) {
-        DirectoryNode[] newChildren =
-                (DirectoryNode[]) Arrays.stream(children).filter(c -> !c.equals(child)).toArray();
+        DirectoryNode[] newChildren = new DirectoryNode[children.length];
+        for (int i = 0; i < this.getNumChildren(); i++) {
+            if (children[i] == child) {
+                System.arraycopy(children, 0, newChildren, 0, i);
+                System.arraycopy(children, i + 1, newChildren, i, children.length - i - 1);
+            }
+        }
         setChildren(newChildren);
         child.setParent(null);
         this.numChildren--;
