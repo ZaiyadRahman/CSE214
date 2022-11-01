@@ -15,7 +15,6 @@ public class DirectoryTree {
 
     private final DirectoryNode root;
     private DirectoryNode cursor;
-    private final int INDENT = 4;
 
     /**
      * Default constructor for the DirectoryTree class.
@@ -112,38 +111,7 @@ public class DirectoryTree {
         }
     }
 
-    /**
-     * Finds the node given the name of the node starting at the root of the
-     * tree.
-     * @param name
-     * The name of the node to be found.
-     * @return
-     * The node with the given name.
-     */
-    public DirectoryNode search(String name) {
-        return searchHelper(root, name);
-    }
 
-    /**
-     * Finds the node given the name of the node to be found, starting at a
-     * given node.
-     * @param node
-     * The node to start searching from.
-     * @param name
-     * The name of the node to be found.
-     * @return
-     * The node with the given name.
-     */
-    public DirectoryNode searchHelper(DirectoryNode node, String name) {
-        if (node.getName().equals(name)) {
-            return node;
-        } else if (!node.isFile()) {
-            for (int i = 0; i < node.getNumChildren(); i++) {
-                return searchHelper(node.getChild(i), name);
-            }
-        }
-        return null;
-    }
 
     /**
      * Returns a String containing the path of directory names from the root
@@ -284,8 +252,10 @@ public class DirectoryTree {
      * The node to move the source node into.
      */
     public void moveNode(String src, String dst) {
-        DirectoryNode srcNode = findNode(root, src);
-        DirectoryNode dstNode = findNode(root, dst);
+        DirectoryNode srcNode = parseAbsPath(src);
+        resetCursor();
+        DirectoryNode dstNode = parseAbsPath(dst);
+        resetCursor();
         if (srcNode == null) {
             System.out.println("ERROR: No such file or directory named " + src + ".");
         } else if (dstNode == null) {
@@ -300,6 +270,19 @@ public class DirectoryTree {
                 System.out.println("ERROR: Cannot move to a file.");
             }
         }
+    }
+
+    public DirectoryNode parseAbsPath(String path) {
+        String[] absPath = path.split("/");
+        try {
+            for (int i = 0; i < absPath.length - 1; i++) {
+                this.changeDirectory(absPath[i]);
+            }
+        }
+        catch (NotADirectoryException e) {
+            System.out.println("Directory not found.");
+        }
+        return findNode(cursor, absPath[absPath.length - 1]);
     }
 
     public DirectoryNode getRoot() {
