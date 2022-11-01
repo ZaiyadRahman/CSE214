@@ -6,42 +6,40 @@ public class DirectoryNode {
     }
 
     private String name;
-    private boolean isFile;
-    private DirectoryNode left;
-    private DirectoryNode right;
-    private DirectoryNode middle;
+    private final boolean isFile;
+    private DirectoryNode[] children;
+    private DirectoryNode parent;
+    private int numChildren;
 
     DirectoryNode() {
         name = "";
         isFile = false;
-        left = null;
-        right = null;
-        middle = null;
+        children = new DirectoryNode[10];
+        parent = null;
+        numChildren = 0;
     }
 
-    public DirectoryNode(String name, boolean isFile, DirectoryNode left, DirectoryNode right, DirectoryNode middle) {
+    public DirectoryNode(String name, boolean isFile, DirectoryNode parent) {
         this.name = name;
         this.isFile = isFile;
-        this.left = left;
-        this.right = right;
-        this.middle = middle;
+        children = new DirectoryNode[10];
+        this.parent = parent;
+        numChildren = 0;
     }
-
 
 
     public void addChild(DirectoryNode newChild) throws FullDirectoryException, NotADirectoryException {
-        if(!isFile()) {
-            if(this.getLeft() == null)
-                this.setLeft(newChild);
-            else if(this.getMiddle() == null)
-                this.setMiddle(newChild);
-            else if(this.getRight() == null)
-                this.setRight(newChild);
-            else
-                throw new FullDirectoryException();
-
-        }
-        else
+        if (!isFile()) {
+            for (int i = 0; i < children.length; i++) {
+                if (children[i] == null) {
+                    children[i] = newChild;
+                    newChild.setParent(this);
+                    this.numChildren++;
+                    break;
+                } else if (i == children.length - 1)
+                    throw new FullDirectoryException();
+            }
+        } else
             throw new NotADirectoryException();
     }
 
@@ -57,35 +55,7 @@ public class DirectoryNode {
         return isFile;
     }
 
-    public void setFile(boolean file) {
-        isFile = file;
-    }
-
-    public DirectoryNode getLeft() {
-        return left;
-    }
-
-    public void setLeft(DirectoryNode left) {
-        this.left = left;
-    }
-
-    public DirectoryNode getRight() {
-        return right;
-    }
-
-    public void setRight(DirectoryNode right) {
-        this.right = right;
-    }
-
-    public DirectoryNode getMiddle() {
-        return middle;
-    }
-
-    public void setMiddle(DirectoryNode middle) {
-        this.middle = middle;
-    }
-
-    public boolean isEmpty() {
-        return this.getName().isBlank();
+    public DirectoryNode getParent() {
+        return parent;
     }
 }

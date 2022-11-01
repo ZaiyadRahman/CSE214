@@ -1,20 +1,12 @@
 package com.company.hw5;
 
 public class DirectoryTree {
-    public static void main(String[] args) {
-
-    }
-
-    /*
-    TODO Overall
-     Test algorithms.
-     */
 
     private DirectoryNode root;
     private DirectoryNode cursor;
 
     public DirectoryTree() {
-        this.root = new DirectoryNode("root", false, null, null, null);
+        this.root = new DirectoryNode("root", false, null);
         this.cursor = root;
     }
 
@@ -22,41 +14,55 @@ public class DirectoryTree {
         this.cursor = root;
     }
 
-    public void changeDirectory(String name) throws NotADirectoryException {
-        if(name.equals(".."))
-            resetCursor();
-
-        else {
-            String[] strings = name.split("/");
-            findNode(cursor, strings[strings.length - 1]);
+    public void changeDirectory(String path) throws NotADirectoryException {
+        DirectoryNode found = findNode(path);
+        if (found == null) {
+            System.out.println("ERROR: No such directory named " + path + ".");
+        } else if (found.isFile()) {
+            throw new NotADirectoryException();
+        } else {
+            this.cursor = found;
         }
     }
 
-    public void makeDirectory(String name) throws IllegalArgumentException,
-            FullDirectoryException, NotADirectoryException {
-        if (name.contains(" ") || name.contains("/"))
-            throw new IllegalArgumentException();
-        cursor.addChild(new DirectoryNode(name, false, null, null, null));
-    }
-
-    public void makeFile(String name) throws FullDirectoryException,
-            IllegalArgumentException, NotADirectoryException {
-        if (name.contains(" ") || name.contains("/"))
-            throw new IllegalArgumentException();
-        cursor.addChild(new DirectoryNode(name, true, null, null, null));
-    }
-
-    public void findNode(DirectoryNode cursor, String name) {
-        if(cursor.getName().equals(name)) {
-            this.cursor = cursor;
+    public void changeDirectoryToParent() {
+        DirectoryNode parent = cursor.getParent();
+        if (parent == null) {
+            System.out.println("ERROR: Already at root directory.");
+        } else {
+            this.cursor = parent;
         }
-        else {
-            if(cursor.getLeft() != null)
-                findNode(cursor.getLeft(), name);
-            if(cursor.getMiddle() != null)
-                findNode(cursor.getMiddle(), name);
-            if(cursor.getRight() != null)
-                findNode(cursor.getRight(), name);
+    }
+
+    public DirectoryNode findNode(String path) {
+        return findNode(cursor, path);
+    }
+
+    public DirectoryNode findNode(DirectoryNode node, String path) {
+        if (node.getName().equals(path)) {
+            return node;
+        } else if (node.isFile()) {
+            return null;
+        } else if (!path.contains("/")) {
+            for (DirectoryNode child : node.getChildren()) {
+                DirectoryNode found = findNode(child, path);
+                if (found != null) {
+                    return found;
+                }
+            }
+            return null;
+        } else {
+//            split into two parts - the "parent-most" segment/dir and the rest of the path
+            String[] split = path.split("/", 2);
+//            see if any children of the current node match the "parent-most"
+//            segment - if so, that means we're getting warmer!
+//            thus, recurse on that child with the rest of the path
+            for (DirectoryNode child : node.getChildren()) {
+                if (child.getName().equals(split[0])) {
+                    return findNode(child, split[1]);
+                }
+            }
+            return null;
         }
     }
     /*
@@ -67,19 +73,34 @@ public class DirectoryTree {
      slash "/".
      ***The cursor remains at the same DirectoryNode.***
     */
-    public void presentWorkingDirectory() {
-
+    public String presentWorkingDirectory() {
+        return getFullPath(cursor);
     }
+
+    public String getFullPath(DirectoryNode node) {
+        StringBuilder path = new StringBuilder(node.getName());
+        DirectoryNode temp = node;
+        while (temp != root) {
+            temp = temp.getParent();
+            path = new StringBuilder(temp.getName() + ("/" + path));
+        }
+        return path.toString();
+    }
+
+
     /*
-    TODO 3
-     public String listDirectory()
-     Returns a String containing a space-separated list of names of all the
-     child directories or files of the cursor.
-     e.g. dev home bin if the cursor is at root in the example above.
-     ***The cursor remains at the same DirectoryNode.***
-     */
+       public String listDirectory()
+       Returns a String containing a space-separated list of names of all the
+       child directories or files of the cursor.
+       e.g. dev home bin if the cursor is at root in the example above.
+       ***The cursor remains at the same DirectoryNode.***
+        */
     public String listDirectory() {
-        return "this is not complete";
+        StringBuilder list = new StringBuilder();
+        for (int i = 0; i < cursor.getNumChildren(); i++) {
+            list.append(cursor.getChild(i).getName()).append(" ");
+        }
+        return list.toString();
     }
 
     /*
@@ -88,8 +109,69 @@ public class DirectoryTree {
      Prints a formatted nested list of names of all the nodes in the directory tree, starting from the cursor.
      */
     public void printDirectoryTree() {
+        DirectoryNode temp = cursor;
+        printDirectoryTreeHelper(temp);
+    }
 
+    private void printDirectoryTreeHelper(DirectoryNode temp) {
+        // pre-order traversal
+        // print *ROOT* first
+        if (temp.isFile()) {
+            System.out.println("- " + temp.getName());
+        } else {
+            System.out.println("|- " + temp.getName());
+
+            if (temp.getNumChildren() == 0) {
+                for (DirectoryNode child :
+                        temp.getChildren()) {
+                    printDirectoryTreeHelper(child);
+                }
+            }
+        }
+    }
+
+    public void makeFile(String name) throws FullDirectoryException,
+            IllegalArgumentException {
+        if (name.contains(" ") || name.contains("/"))
+            throw new IllegalArgumentException();
+        try {
+            cursor.addChild(new DirectoryNode(name, true, cursor));
+        } catch (NotADirectoryException e) {
+//            do nothing
+        }
+    }
+
+    public void makeDirectory(String name) throws IllegalArgumentException,
+            FullDirectoryException {
+        if (name.contains(" ") || name.contains("/"))
+            throw new IllegalArgumentException();
+        try {
+            cursor.addChild(new DirectoryNode(name, false, cursor));
+        } catch (NotADirectoryException e) {
+//            pass
+        }
+    }
+
+    public void moveNode(String src, String dst) {
+        DirectoryNode srcNode = findNode(root, src);
+        DirectoryNode dstNode = findNode(root, dst);
+        if (srcNode == null) {
+            System.out.println("ERROR: No such file or directory named " + src + ".");
+        } else if (dstNode == null) {
+            System.out.println("ERROR: No such directory named " + dst + ".");
+        } else {
+            srcNode.getParent().removeChild(srcNode);
+            try {
+                dstNode.addChild(srcNode);
+            } catch (FullDirectoryException e) {
+                System.out.println("ERROR: Destination directory is full.");
+            } catch (NotADirectoryException e) {
+                System.out.println("ERROR: Cannot move to a file.");
+            }
+        }
     }
 
 
 }
+
+
