@@ -1,0 +1,15 @@
+input permutations:
+
+- pwd
+- ls
+- ls -R
+- cd <>
+- cd /
++ cd ..
++ cd <abs>
+- mkdir <>
+- touch <>
+- exit
+------
++ find <name>
++ move <> <>

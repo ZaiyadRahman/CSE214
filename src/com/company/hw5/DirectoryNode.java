@@ -1,5 +1,7 @@
 package com.company.hw5;
 
+import java.util.Arrays;
+
 public class DirectoryNode {
     public static void main(String[] args) {
 
@@ -11,7 +13,7 @@ public class DirectoryNode {
     private DirectoryNode parent;
     private int numChildren;
 
-    DirectoryNode() {
+    public DirectoryNode() {
         name = "";
         isFile = false;
         children = new DirectoryNode[10];
@@ -43,6 +45,14 @@ public class DirectoryNode {
             throw new NotADirectoryException();
     }
 
+    public void removeChild(DirectoryNode child) {
+        DirectoryNode[] newChildren =
+                (DirectoryNode[]) Arrays.stream(children).filter(c -> !c.equals(child)).toArray();
+        setChildren(newChildren);
+        child.setParent(null);
+        this.numChildren--;
+    }
+
     public String getName() {
         return name;
     }
@@ -57,5 +67,25 @@ public class DirectoryNode {
 
     public DirectoryNode getParent() {
         return parent;
+    }
+
+    public void setParent(DirectoryNode parent) {
+        this.parent = parent;
+    }
+
+    public DirectoryNode[] getChildren() {
+        return children;
+    }
+
+    public DirectoryNode getChild(int index) {
+        return children[index];
+    }
+
+    public void setChildren(DirectoryNode[] children) {
+        this.children = children;
+    }
+
+    public int getNumChildren() {
+        return numChildren;
     }
 }

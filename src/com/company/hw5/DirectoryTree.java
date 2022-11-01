@@ -2,7 +2,7 @@ package com.company.hw5;
 
 public class DirectoryTree {
 
-    private DirectoryNode root;
+    private final DirectoryNode root;
     private DirectoryNode cursor;
 
     public DirectoryTree() {
@@ -65,8 +65,23 @@ public class DirectoryTree {
             return null;
         }
     }
+
+    public DirectoryNode search(String name) {
+        return searchHelper(root, name);
+    }
+
+    public DirectoryNode searchHelper(DirectoryNode node, String name) {
+        if (node.getName().equals(name)) {
+            return node;
+        } else if (!node.isFile()) {
+            for (DirectoryNode child : node.getChildren()) {
+                return searchHelper(child, name);
+            }
+        }
+        return null;
+    }
+
     /*
-    TODO 2
      public String presentWorkingDirectory()
      Returns a String containing the path of directory names from the root
      node of the tree to the cursor, with each name separated by a forward
@@ -104,9 +119,24 @@ public class DirectoryTree {
     }
 
     /*
-    TODO 4
-     public void printDirectoryTree()
-     Prints a formatted nested list of names of all the nodes in the directory tree, starting from the cursor.
+    Prints a formatted nested list of names of all the nodes in the directory tree, starting from the cursor.
+    The cursor remains at the same DirectoryNode.
+    Prints in the following format:
+    |- root
+    |- dev
+        - ttys0
+        - ttys1
+    |- home
+        |- user
+            |- Documents
+                - hw5.java
+                - resume.pdf
+            |- Pictures
+                - puppies.jpg
+            |- Downloads
+    |- bin
+        - sublime
+        - gcc
      */
     public void printDirectoryTree() {
         DirectoryNode temp = cursor;
