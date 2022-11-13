@@ -102,9 +102,9 @@ public class DirectoryTree {
 //            see if any children of the current node match the "parent-most"
 //            segment
 //            thus, recurse on that child with the rest of the path
-            for (DirectoryNode child : node.getChildren()) {
-                if (child.getName().equals(split[0])) {
-                    return findNode(child, split[1]);
+            for (int i = 0; i < node.getNumChildren(); i++) {
+                if (node.getChild(i).getName().equals(split[0])) {
+                    return findNode(node.getChild(i), split[1]);
                 }
             }
             return null;
