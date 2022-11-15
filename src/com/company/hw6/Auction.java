@@ -53,11 +53,7 @@ public class Auction implements Serializable {
     }
 
     public void decrementTimeRemaining(int time) {
-        if(timeRemaining - time < 0) {
-            timeRemaining = 0;
-        } else {
-            timeRemaining -= time;
-        }
+        timeRemaining = Math.max(0, timeRemaining - time);
     }
 
     public void newBid(String bidderName, double bidAmount) throws ClosedAuctionException {
