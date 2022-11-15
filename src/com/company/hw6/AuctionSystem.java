@@ -18,12 +18,9 @@ import java.util.Scanner;
 public class AuctionSystem implements Serializable {
         /*
         TODO
-         fix buildfromURL() method from throwing exceptions
-         FIX auctionTable.buildFromURL() METHOD, throws exceptions multiple
-         times
-         Implement serializable interface PROPERLY to save auction table
-         according to HTML file and reload it when program is run again.
-         Finish menu
+         Fix removeExpiredAuctions() method, cannot delete due to concurrent modification exception.
+         Fix buildFromURL() to handle the weird edge case of someone having a
+          name with a space in it
          bugfix
          */
 
@@ -66,16 +63,9 @@ public class AuctionSystem implements Serializable {
         String choice = input.nextLine();
         auctionSystem.setUsername(choice);
         AuctionSystem.printMenu();
-        choice = input.nextLine();
         do {
+            choice = input.nextLine();
             switch (choice.toUpperCase()) {
-                /*
-                TODO
-                 Check if putAll is being used correctly, or if another
-                 method needs to be used to accomplish the same goal.
-                 After it's supposed to be done, it should printmenu() and
-                 break. Instead, it just stays empty.
-                 */
                 case "D" -> {
                     System.out.println("Enter URL: ");
                     String URL = input.nextLine();
@@ -94,11 +84,17 @@ public class AuctionSystem implements Serializable {
                     String auctionID = input.nextLine();
                     System.out.println("Please enter an auction time: ");
                     int auctionTime = input.nextInt();
+                    if(auctionTime < 0) {
+                        System.out.println("Invalid auction time. Auction time must be greater than 0.");
+                        AuctionSystem.printMenu();
+                        break;
+
+                    }
                     System.out.println("Please enter some auction info: ");
                     input.nextLine();
                     String auctionInfo = input.nextLine();
                     auctionSystem.auctionTable.putAuction(auctionID,
-                            new Auction(auctionTime, -1, auctionID,
+                            new Auction(auctionTime, 0, auctionID,
                                     auctionSystem.username, "", auctionInfo));
 
                     AuctionSystem.printMenu();
@@ -108,32 +104,35 @@ public class AuctionSystem implements Serializable {
                     String curBid;
                     System.out.println("Enter auction ID: ");
                     String auctionID = input.nextLine();
-                    Auction temp = auctionSystem.auctionTable.getAuction(auctionID);
-                    if(temp.getCurrentBid() < 0)
-                        curBid = "None";
-                    else
-                        curBid = String.valueOf(temp.getCurrentBid());
-                    if(temp.isOpen()) {
-                        System.out.println("Auction " + auctionID + " is OPEN");
-                        System.out.println("    Current bid: " + curBid);
-                        System.out.println("What would you like to bid?: ");
-                        double bid = input.nextDouble();
-                        try {
+                    try {
+                        Auction temp = auctionSystem.auctionTable.getAuction(auctionID);
+                        if (temp.getCurrentBid() < 0)
+                            curBid = "None";
+                        else
+                            curBid = String.valueOf(temp.getCurrentBid());
+                        if (temp.isOpen()) {
+                            System.out.println("Auction " + auctionID + " is OPEN");
+                            System.out.println("    Current bid: " + curBid);
+                            System.out.println("What would you like to bid?: ");
+                            double bid = input.nextDouble();
                             auctionSystem.auctionTable.getAuction(auctionID).newBid(auctionSystem.username, bid);
-                        } catch (ClosedAuctionException e) {
-                            if(e.getMessage() != null)
-                                System.out.println(e.getMessage());
+
+                        } else {
+                            System.out.println("Auction " + auctionID + " is CLOSED");
+                            System.out.println("    Current bid: " + curBid);
+                            System.out.println("You can no longer bid on this " +
+                                    "item.");
                         }
                     }
-
-                    else {
-                        System.out.println("Auction " + auctionID + " is CLOSED");
-                        System.out.println("    Current bid: " + curBid);
-                        System.out.println("You can no longer bid on this " +
-                                "item.");
+                    catch(ClosedAuctionException | IllegalArgumentException e){
+                            if (e.getMessage() != null)
+                                System.out.println(e.getMessage());
+                        }
+                    catch (NullPointerException e) {
+                        System.out.println("Auction " + auctionID + " does not exist.");
                     }
 
-                    AuctionSystem.printMenu();
+                        AuctionSystem.printMenu();
                 }
 
                 case "P" -> {
@@ -144,7 +143,8 @@ public class AuctionSystem implements Serializable {
                 case "I" -> {
                     System.out.println("Please enter an auction ID: ");
                     String auctionID = input.nextLine();
-                    Auction temp = auctionSystem.auctionTable.getAuction(auctionID);
+                    try {
+                        Auction temp = auctionSystem.auctionTable.getAuction(auctionID);
                     System.out.println("    Auction " + temp.getAuctionID() +
                             ":");
                     System.out.println("    Seller: " + temp.getSellerName());
@@ -152,6 +152,9 @@ public class AuctionSystem implements Serializable {
                     System.out.println("    Time: " + temp.getTimeRemaining() +
                             "hours");
                     System.out.println("    Info: " + temp.getItemInfo());
+                    } catch (IllegalArgumentException | NullPointerException e) {
+                        System.out.println("Auction " + auctionID + " does not exist.");
+                    }
 
                     AuctionSystem.printMenu();
                 }
@@ -164,7 +167,12 @@ public class AuctionSystem implements Serializable {
                 case "T" -> {
                     System.out.println("How many hours should pass: ");
                     int hours = input.nextInt();
-                    auctionSystem.auctionTable.letTimePass(hours);
+                    try {
+                        auctionSystem.auctionTable.letTimePass(hours);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+
                     AuctionSystem.printMenu();
                 }
 
@@ -258,5 +266,6 @@ public class AuctionSystem implements Serializable {
                 "(R) - Remove Expired Auctions\n" +
                 "(T) - Let Time Pass\n" +
                 "(Q) - Quit");
+        System.out.print("Please select an option: ");
     }
 }

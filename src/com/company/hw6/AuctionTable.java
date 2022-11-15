@@ -12,6 +12,9 @@ package com.company.hw6;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+
 import big.data.DataSource;
 
 public class AuctionTable extends Hashtable<String, Auction> implements Serializable {
@@ -52,12 +55,14 @@ listing/auction_info/high_bidder/bidder_name
                 "/hard_drive");
 
         ArrayList<String> itemInfo = new ArrayList<>();
-        for (int i = 0; i < cpu.length; i++) {
-            itemInfo.add(cpu[i] + " - " + memory[i] + " - " + hardDrive[i]);
-        }
-
         AuctionTable table = new AuctionTable();
         for (int i = 0; i < auctionIDs.length; i++) {
+            if(memory[i].isBlank())
+                memory[i] = "N/A";
+            if(hardDrive[i].isBlank())
+                hardDrive[i] = "N/A";
+            itemInfo.add(cpu[i] + " - " + memory[i] + " - " + hardDrive[i]);
+
             if(currentBids[i] == null || currentBids[i].equals("")) {
                 currentBids[i] = "-1";
             }
@@ -74,6 +79,10 @@ listing/auction_info/high_bidder/bidder_name
 
             else
                 timeRemaining[i] = timeRemaining[i].split(" ")[0];
+
+            sellerNames[i] = sellerNames[i].replace("\n", " ");
+            sellerNames[i] = sellerNames[i].replace("\t", " ");
+            sellerNames[i] = sellerNames[i].replace("\r", " ");
             Auction auction = new Auction(Integer.parseInt(timeRemaining[i]),
                     Double.parseDouble(currentBids[i]), auctionIDs[i],
                     sellerNames[i], bidderNames[i], itemInfo.get(i));
@@ -117,7 +126,8 @@ listing/auction_info/high_bidder/bidder_name
      */
     public void letTimePass(int numHours) throws IllegalArgumentException {
         if(numHours <= 0) {
-            throw new IllegalArgumentException("numHours must be positive");
+            throw new IllegalArgumentException("number of hours must be " +
+                    "positive");
         }
         for(Auction auction : values()) {
             auction.decrementTimeRemaining(numHours);
@@ -128,10 +138,16 @@ listing/auction_info/high_bidder/bidder_name
      * Iterates over all Auction objects in the table and removes them if
      * they are expired (timeRemaining == 0).
      */
+
+    //FIXME
     public void removeExpiredAuctions() {
-        for(Auction auction : values()) {
-            if(auction.getTimeRemaining() == 0) {
-                remove(auction.getAuctionID());
+        Iterator<Map.Entry<String, Auction>> iterator =
+                this.entrySet().iterator();
+        while (iterator.hasNext()) {
+            iterator.next();
+            Map.Entry<String, Auction> entry = iterator.next();
+            if(entry.getValue().getTimeRemaining() == 0) {
+                iterator.remove();
             }
         }
     }
@@ -152,9 +168,11 @@ listing/auction_info/high_bidder/bidder_name
     @Override
     public synchronized String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%13s%13s%24s%26s%12s%43s", "Auction ID |",
-                "Bid |",
-                "Seller |", "Buyer |", "Time |", "Item Info")).append("\n");
+        sb.append(String.format("%12s%1s%12s%1s%24s%1s%26s%1s%12s%1s%-43s",
+                "Auction ID " ,"|",
+                "Bid     ", "|",
+                "Seller        ", "|", "Buyer         ", "|",
+                "Time    ", "|", "  Item Info ")).append("\n");
         sb.append(
                 "=============================================================" +
                         "====================================================" +

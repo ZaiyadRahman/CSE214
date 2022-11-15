@@ -86,6 +86,8 @@ public class Auction implements Serializable {
      * Thrown if the time remaining is 0, meaning the auction is closed.
      */
     public void newBid(String bidderName, double bidAmount) throws ClosedAuctionException {
+        if(bidAmount < 0)
+            throw new IllegalArgumentException("Bid amount cannot be negative.");
         if(timeRemaining < 0)
             throw new ClosedAuctionException("Auction is closed.");
 
@@ -162,13 +164,18 @@ public class Auction implements Serializable {
     @Override
     public String toString() {
         String currentBidString;
-        if(currentBid < 0)
+        String itemInfoTruncated;
+        if(currentBid == 0)
             currentBidString = "";
         else
             currentBidString = String.format("$%.2f", currentBid);
+        if(itemInfo.length() > 43)
+            itemInfoTruncated = itemInfo.substring(0, 43);
+        else
+            itemInfoTruncated = itemInfo;
 
-         return String.format("%-13s%13s%-24s%-26s%-12s%-43s", auctionID,
-               "| $ " + currentBidString, "| " + sellerName, "| " + buyerName,
-                 "| " + timeRemaining + " hours", "| " + itemInfo);
+         return String.format("%-12s%-13s%-25s%-27s%-13s%-42s", auctionID,
+               "|" + currentBidString, "| " + sellerName, "| " + buyerName,
+                 "| " + timeRemaining + " hours", "| " + itemInfoTruncated);
     }
 }
