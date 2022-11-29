@@ -16,14 +16,6 @@ import java.io.*;
 import java.util.Scanner;
 
 public class AuctionSystem implements Serializable {
-        /*
-        TODO
-         Fix removeExpiredAuctions() method, cannot delete due to concurrent modification exception.
-         Fix buildFromURL() to handle the weird edge case of someone having a
-          name with a space in it
-         bugfix
-         */
-
     /**
      * First prompts the user for a username. This is stored in username. The
      * rest of the program will be executed on behalf of this user.
@@ -82,7 +74,8 @@ public class AuctionSystem implements Serializable {
                     System.out.println("Creating new auction as " + auctionSystem.username + ".");
                     System.out.println("Please enter auction ID: ");
                     String auctionID = input.nextLine();
-                    System.out.println("Please enter an auction time: ");
+                    System.out.println("Please enter an auction time (hours):" +
+                            " ");
                     int auctionTime = input.nextInt();
                     if(auctionTime < 0) {
                         System.out.println("Invalid auction time. Auction time must be greater than 0.");
@@ -189,6 +182,11 @@ public class AuctionSystem implements Serializable {
                     System.out.println("Done!");
                     System.out.println("Goodbye.");
                 }
+
+                default -> {
+                    System.out.println("Invalid input. Please try again.");
+                    AuctionSystem.printMenu();
+                }
             }
         } while(!choice.equalsIgnoreCase("Q"));
 
@@ -249,7 +247,8 @@ public class AuctionSystem implements Serializable {
      * @throws ClassNotFoundException
      * If the file cannot be found or is not an auction table.
      */
-    public static AuctionTable readAuctionTable(String filename) throws IOException, ClassNotFoundException {
+    public static AuctionTable readAuctionTable(String filename) throws
+            IOException, ClassNotFoundException {
         AuctionTable auctionTable = new AuctionTable();
             FileInputStream file = new FileInputStream(filename);
             ObjectInputStream inStream = new ObjectInputStream(file);

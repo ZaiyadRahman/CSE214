@@ -9,13 +9,10 @@
 
 package com.company.hw6;
 
+import big.data.DataSource;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-
-import big.data.DataSource;
 
 public class AuctionTable extends Hashtable<String, Auction> implements Serializable {
 
@@ -27,14 +24,6 @@ public class AuctionTable extends Hashtable<String, Auction> implements Serializ
      * The AuctionTable constructed from the remote data source.
      * @throws IllegalArgumentException
      * Thrown if the URL does not represent a valid datasource (can't connect or invalid syntax).
-     */
-
-    /*
-    listing/seller_info/seller_name
-listing/auction_info/current_bid
-listing/auction_info/time_left
-listing/auction_info/id_num
-listing/auction_info/high_bidder/bidder_name
      */
     public static AuctionTable buildFromURL(String URL) throws IllegalArgumentException {
         DataSource ds = DataSource.connect(URL).load();
@@ -57,6 +46,8 @@ listing/auction_info/high_bidder/bidder_name
         ArrayList<String> itemInfo = new ArrayList<>();
         AuctionTable table = new AuctionTable();
         for (int i = 0; i < auctionIDs.length; i++) {
+            if(cpu[i].isBlank())
+                cpu[i] = "N/A";
             if(memory[i].isBlank())
                 memory[i] = "N/A";
             if(hardDrive[i].isBlank())
@@ -74,15 +65,16 @@ listing/auction_info/high_bidder/bidder_name
             currentBids[i] = currentBids[i].replace(",", "");
             if(timeRemaining[i].contains("days")) {
                 timeRemaining[i] =
-                        String.valueOf(Integer.parseInt(timeRemaining[i].split(" ")[0]) * 24);
+                        String.valueOf(Integer.parseInt(
+                                timeRemaining[i].split(" ")[0]) * 24);
             }
 
             else
                 timeRemaining[i] = timeRemaining[i].split(" ")[0];
 
+            sellerNames[i] = sellerNames[i].replace("\r", " ");
             sellerNames[i] = sellerNames[i].replace("\n", " ");
             sellerNames[i] = sellerNames[i].replace("\t", " ");
-            sellerNames[i] = sellerNames[i].replace("\r", " ");
             Auction auction = new Auction(Integer.parseInt(timeRemaining[i]),
                     Double.parseDouble(currentBids[i]), auctionIDs[i],
                     sellerNames[i], bidderNames[i], itemInfo.get(i));
@@ -101,7 +93,8 @@ listing/auction_info/high_bidder/bidder_name
      * @throws IllegalArgumentException
      * Thrown if the given auctionID is already stored in the table.
      */
-    public void putAuction(String auctionID, Auction auction) throws IllegalArgumentException {
+    public void putAuction(String auctionID, Auction auction) throws
+            IllegalArgumentException {
         putIfAbsent(auctionID, auction);
     }
 
@@ -129,9 +122,11 @@ listing/auction_info/high_bidder/bidder_name
             throw new IllegalArgumentException("number of hours must be " +
                     "positive");
         }
+        System.out.println("Time passing...");
         for(Auction auction : values()) {
             auction.decrementTimeRemaining(numHours);
         }
+        System.out.println("Auction times updated.");
     }
 
     /**
@@ -141,15 +136,8 @@ listing/auction_info/high_bidder/bidder_name
 
     //FIXME
     public void removeExpiredAuctions() {
-        Iterator<Map.Entry<String, Auction>> iterator =
-                this.entrySet().iterator();
-        while (iterator.hasNext()) {
-            iterator.next();
-            Map.Entry<String, Auction> entry = iterator.next();
-            if(entry.getValue().getTimeRemaining() == 0) {
-                iterator.remove();
-            }
-        }
+        this.entrySet().removeIf(entry -> entry.getValue().getTimeRemaining() == 0);
+
     }
 
     /**
@@ -184,11 +172,3 @@ listing/auction_info/high_bidder/bidder_name
         return sb.toString();
     }
 }
-
-// Auction ID |      Bid   |        Seller         |          Buyer          |    Time   |  Item Info // truncated to fit on one line
-//===================================================================================================================================
-//  511601118 | $   620.00 | cubsfantony           |  gosha555@excite.com    | 110 hours | Pentium III 933 System - 256MB PC133 SDram
-//  511448507 | $   620.00 | ct-inc                |  petitjc@yahoo.com      |  54 hours | Pentium III 800EB-MHz Coppermine CPU - 256
-//  511443245 | $ 1,025.00 | ct-inc                |  hsclm9@peganet.com     |  54 hours | Intel Pentium III 933EB-MHz Coppermine CPU
-//  511364992 | $   610.00 | bestbuys4systems      |  wizbang4               |  53 hours | Genuine Intel Pentium III 1000MHz Processo
-//  511357667 | $   535.00 | sales@ctgcom.com      |  chul2@mail.utexas.edu  |  53 hours | INTEL Pentium III 800MHz - 256MB sdram -40
