@@ -1,0 +1,986 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head></head><body>
+
+
+    
+
+
+
+
+
+
+<div lang="EN-US">
+
+<div>
+
+<h2 align="center" style="text-align:center;">
+    <span>
+        <img width="244" height="121" src="http://www.cs.stonybrook.edu/~cse214/images/logo.gif"/>
+    </span>
+    <br/>
+    <span style="font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;color:maroon;">
+        HOMEWORK 7- FALL 2022
+    </span>
+</h2>
+
+<hr size="2" width="100%" align="center"/>
+
+<h3>
+    <span style="font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;">
+        <b>HOMEWORK 7 - due Tuesday, November 29th no later than 6:00PM</b>
+    </span>
+</h3>
+
+<p><strong><span style="font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;">
+    REMINDERS:
+</span></strong></p>
+
+<ul type="disc">
+<li><b><span style="color:red;font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;">
+   Use of a package is optional. If you wish to use it, make sure to name it &quot;hw7&quot; (all in lower case). Otherwise, you will lose points.</span></b><span></span></li>
+
+ <li><b><span style="font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;">Be sure your
+     code follows the <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/codingstyle.htm" target="_blank">coding
+     style</a> for CSE214. </span></b><span></span></li>
+ <li><b><span style="font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;">Make sure
+     you read the warnings about <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/courseinfo.htm" target="_blank">academic dishonesty</a>.
+     <i>Remember, all work you submit for homework or exams MUST be your own
+     work.</i> </span></b></li>
+ <li><b><span style="font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;">Login to
+     your <a rel="noopener" href="http://facdev04.cs.stonybrook.edu:8080/grade.Login" target="_blank">grading
+     account</a> and click &quot;Submit Assignment&quot; to upload and submit
+     your assignment. </span></b></li>
+
+<li><b><span style="font-family:Arial;color:green;">You may use (and are encouraged to use) any Java
+	API Data Structures you like to implement this assignment. </span></b><b><span style="font-family:Arial,sans-serif;"></span></b></li>
+<li><b><span style="font-family:Arial,sans-serif;">You may
+     use Scanner, InputStreamReader, or any other class that you wish for
+     keyboard input.</span></b></li>
+</ul>
+
+<hr size="2" width="100%" align="center"/>
+
+<p><strong>The World Wide Web is an open source information space where documents (<i>pages</i>) and other web resources
+are identified by URLs and can be accessed via hyperlinks. The system can be described as a directed graph
+(or &#39;web&#39;) of pages in which a link from page A to page B corresponds to a directed edge from node A to node
+B. Each document can be abbreviated as a handful of important keywords describing what the document is about.
+Given the vast amount of information available on the web, searching for the most relevant pages containing
+a keyword in an efficient manner is an incredibly important operation. In this assignment, you will create a
+basic search engine to generate a sorted list of web pages using a simplified version of Google&#39;s PageRank
+algorithm.</strong></p>
+
+<p><strong>For this assignment, you will build a directed graph of WebPage objects by reading two files:
+<span class="code">pages.txt</span> and <span class="code">links.txt</span> (instructions on how to do so
+are included further below). Once the graph is constructed, you will run a basic search engine that prompts
+the user to enter a keyword. You will then perform the PageRank algorithm, and display the pages to the user
+in tabular form sorted by descending PageRank.</strong></p>
+
+<hr size="2" width="100%" align="center"/>
+
+<h2>Required Classes</h2>
+<p><strong>The following sections describe classes which are required for this assignment. Each
+section provides a description and the specifications necessary to complete each class. If you feel
+that additional methods would be useful, feel free to add them during your implementation
+as you see fit. However, all the variables and methods in the following specifications must be
+included in your project.</strong></p>
+
+<img style="display:block;margin-left:auto;margin-right:auto;" width="1200px" border="2px" src="http://www.cs.stonybrook.edu/~cse214/hw/hw7-images/hw7_uml_f20.png"/>
+<figcaption style="font-family:sans-serif;text-align:center;"><strong><br/>UML Diagram.<br/></strong>
+</figcaption>
+
+
+<h3>1. WebPage</h3>
+<p><strong>Write a fully-documented class named <span class="code">WebPage</span> which represents a
+hyperlinked document. The <span class="code">WebPage</span> class should contain a String member variable
+for its URL, an int to represent its position in the adjacency matrix, an int to represent the rank (described later in the
+specs) of
+this WebPage, as well as a Collection of Strings containing the keywords describing this this page.
+</strong></p>
+
+<p><strong>
+You should also implement a <span class="code">toString()</span> method, which should print the URL of
+the document as well as all of the associated keywords in a neat tabular form.</strong></p>
+
+
+<ul><strong>
+    </strong><li><strong><span class="code">public WebPage()</span> - constructor (you may include a
+        constructor with parameters)</strong></li><strong><br/>
+    </strong><li><strong>A <span class="code">String</span> member variable:
+        <ul>
+            <li><span class="code">private String url</span></li>
+        </ul><br/>
+    </strong></li><strong>
+    </strong><li><strong>Two <span class="code">int</span> member variables:
+        <ul>
+            <li><span class="code">private int index</span></li>
+            <li><span class="code">private int rank</span></li>
+        </ul><br/>
+    </strong></li><strong>
+    </strong><li><strong>A <span class="code">Collection&lt;String&gt;</span> member variable:
+        <ul>
+            <li><span class="code">private Collection&lt;String&gt; keywords</span></li>
+            <li><span class="comment">Note </span>: When we say <span class="code">
+keywords</span> must be a &quot;Collection&quot; of Strings, we mean that it can be any data structure you like
+that implements the <span class="code">Collection</span> interface - e.g. <span class="code">ArrayList,
+Vector, Array, LinkedList</span>, etc.</li>
+        </ul><br/>
+    </strong></li><strong>
+    </strong><li><strong><span class="code">public toString()</span> - returns string of data members in tabular form.</strong></li><strong>
+        <ul>
+            <li><span class="comment">Note 1</span>: Since we cannot determine the &quot;Links&quot; portion of this WebPage, we will substitute it for a dummy String. For example, we can use &quot;***&quot; (or anything that is unique). A sample result would be:<br/><br/>
+
+<pre style="display:inline;">   0   | google.com         |***| search, knowledge, tech</pre><br/><br/>
+
+In the WebGraph class, when we want to print, we will determine all the Links for the URL &quot;google.com&quot; and can use the String.replace() method to replace your unique String (e.g. ***) with the correct values.</li>
+        </ul>
+    <br/>
+</strong></ul>
+
+<h3>2. WebGraph</h3>
+
+<p><strong>Write a full-documented class named <span class="code">WebGraph</span> that organizes the
+<span class="code">WebPage</span> objects as a directed graph. The class should contain a Collection of
+<span class="code">WebPages</span> member variable called <span class="code">pages</span> and a 2-dimensional
+array of integers (adjacency matrix) member variable called <span class="code">links</span>. The matrix should be of size
+<span class="code">MAX_PAGES x MAX_PAGES</span>, where <span class="code">MAX_PAGES</span> is a static integer
+constant defined as 40. Note that although there will be <span class="code">MAX_PAGES</span> rows and
+<span class="code">MAX_PAGES</span> columns in the matrix, the <i>logical</i> size of the matrix is restricted to the size
+of <span class="code">pages</span>. This means that if there are only 6 elements in the <span class="code">pages</span>
+Collection, then only rows/columns 0 to 5 should be considered part of the matrix, and rows/columns 6 to
+<span class="code">MAX_PAGES-1</span> are out of bounds. If a page is added, then row 6 and column 6 will become available to
+the matrix, whereas if a page is removed, row 5 and column 5 will become unavailable.</strong></p>
+
+<p><strong>Entries in the adjacency matrix will correspond to directed edges in the graph structure. For example,
+if <span class="code">links[i][j]</span> is set to <span class="code">1</span>, then that means there is a hyperlink
+(directed edge) from <span class="code">pages[i]</span> to <span class="code">pages[j]</span> (note that the bracket
+notation for <span class="code">pages</span> is simply used for convenience and does not imply that
+<span class="code">pages</span> has to be an array). Remember that since the graph is directed, an entry of 1
+at <span class="code">links[i][j]</span> does NOT imply that <span class="code">links[j][i]</span> is also 1. Please
+review the following example for an overview of how the graph structure should work.</strong></p>
+
+<br/>
+<figure style="text-align:center;">
+  <img src="http://www.cs.stonybrook.edu/~cse214/hw/hw7-images/matrix.jpg" alt="Directed Graph with Adjacency Matrix"/><br/>
+  <figcaption><b>Directed Graph with Adjacency Matrix.</b></figcaption>
+</figure>
+<br/>
+
+<p><strong>
+<ul>
+
+    <li>A static constant int variable:
+        <ul>
+            <li><span class="code">public static final int MAX_PAGES = 40;</span></li>
+        </ul>
+    </li><br/>
+
+    <li>A Collection of <span class="code">WebPages</span> member variable (<font color="green">Note:</font> This can be
+    any class which implements the <span class="code">Collection</span> interface):
+        <ul>
+            <li><span class="code">private Collection&lt;WebPage&gt; pages;</span></li>
+        </ul>
+    </li><br/>
+
+    <li>A 2-dimensional adjacency matrix of <span class="code">ints</span> member variable:
+        <ul>
+            <li><span class="code">private int[MAX_PAGES][MAX_PAGES] edges;   <span class="comment">// instead of array, you may use ArrayList, Vector, etc.</span></span></li>
+        </ul>
+    </li><br/>
+
+	<li><span class="code">public static WebGraph buildFromFiles(String pagesFile, String linksFile) throws IllegalArgumentException</span>
+		<ul>
+	        <li><i>Brief:</i>
+	            <ul>
+	                <li>Constructs a <span class="code">WebGraph</span> object using the indicated files
+                    as the source for pages and edges.</li>
+	            </ul>
+	        </li><br/>
+
+	        <li><i>Parameters:</i>
+	            <ul>
+	                <li><span class="code">pagesFile</span> - String of the relative path to the file containing the page
+                    information.</li>
+                    <li><span class="code">linksFile</span> - String of the relative path to the file containing the link
+                    information.</li>
+	            </ul>
+	        </li><br/>
+
+	        <li><i>Preconditions:</i>
+	            <ul>
+	                <li>Both parameters reference text files which exist.</li>
+	                <li>The files follow proper format as outlined in the &quot;Reading Graph from File&quot; section below.</li>
+	            </ul>
+	        </li><br/>
+
+	        <li><i>Postconditions:</i>
+	            <ul>
+	                <li>A WebGraph has been constructed and initialized based on the text files.</li>
+	            </ul>
+	        </li><br/>
+
+	        <li><i>Returns:</i>
+	            <ul>
+	                <li>The <span class="code">WebGraph</span> constructed from the text files.</li>
+	            </ul>
+	        </li><br/>
+
+	        <li><i>Throws:</i>
+	            <ul>
+	                <li><span class="code">IllegalArgumentException</span>: Thrown if either of the files does not
+                    reference a valid text file, or if the files are not formatted correctly.</li>
+	            </ul>
+	        </li><br/>
+
+            <li><i>Note:</i>
+                <ul>
+                    <li>See the section &quot;Reading Graph from File&quot; below for information on how to construct the graph
+                    using two files.</li>
+                </ul>
+            </li><br/>
+
+	    </ul>
+	</li>
+    <li><span class="code">public void addPage(String url, Collection&lt;String&gt; keywords) throws IllegalArgumentException</span>
+        <ul>
+            <li><i>Brief:</i>
+                <ul>
+                    <li>Adds a page to the <span class="code">WebGraph</span>.</li>
+                </ul>
+            </li><br/>
+
+            <li><i>Parameters:</i>
+                <ul>
+                    <li><span class="code">url</span> - The URL of the webpage (must not already exist in the <span class="code">WebGraph</span>).</li>
+                    <li><span class="code">keywords</span> - The keywords associated with the WebPage.</li>
+                </ul>
+            </li><br/>
+
+            <li><i>Preconditions:</i>
+                <ul>
+                    <li><span class="code">url</span> is unique and does not exist as the URL of a <span class="code">WebPage</span>
+                    already in the graph.</li>
+                    <li><span class="code">url</span> and <span class="code">keywords</span> are not
+                    <span class="code">null</span>.</li>
+                </ul>
+            </li><br/>
+
+            <li><i>Postconditions:</i>
+                <ul>
+                    <li>The page has been added to <span class="code">pages</span> at index &#39;i&#39; and <font color="red">
+                    <span class="code">links</span> has been logically extended to include the new row and column
+                    indexed by &#39;i&#39;</font>.</li>
+                </ul>
+            </li><br/>
+
+            <li><i>Throws:</i>
+                <ul>
+                    <li><span class="code">IllegalArgumentException</span>: If <span class="code">url</span> is not unique and already
+                    exists in the graph, or if either argument is <span class="code">null</span>.</li>
+                </ul>
+            </li><br/>
+
+        </ul>
+    </li>
+    <li><span class="code">public void addLink(String source, String destination) throws IllegalArgumentException</span>
+		<ul>
+	        <li><i>Brief:</i>
+	            <ul>
+	                <li>Adds a link from the WebPage with the URL indicated by <span class="code">source</span> to the
+                    <span class="code">WebPage</span> with the URL indicated by <span class="code">destination</span></li>
+	            </ul>
+	        </li><br/>
+
+	        <li><i>Parameters:</i>
+	            <ul>
+	                <li><span class="code">source</span> - the URL of the page which contains the hyperlink to
+                    <span class="code">destination</span>.</li>
+                    <li><span class="code">destination</span> - the URL of the page which the hyperlink points to.</li>
+	            </ul>
+	        </li><br/>
+
+            <li><i>Preconditions:</i>
+                <ul>
+                    <li>Both parameters reference <span class="code">WebPages</span> which exist in the graph.</li>
+                </ul>
+            </li><br/>
+
+	        <li><i>Throws:</i>
+	            <ul>
+	                <li><span class="code">IllegalArgumentException</span>: If either of the URLs are null or could not
+                    be found in <span class="code">pages</span>.</li>
+	            </ul>
+	        </li><br/>
+	    </ul>
+	</li>
+    <li><span class="code">public void removePage(String url)</span>
+		<ul>
+	        <li><i>Brief:</i>
+	            <ul>
+	                <li>Removes the <span class="code">WebPage</span> from the graph with the given URL.</li>
+	            </ul>
+	        </li><br/>
+
+	        <li><i>Parameters:</i>
+	            <ul>
+	                <li><span class="code">url</span> - The URL of the page to remove from the graph.</li>
+	            </ul>
+	        </li><br/>
+
+	        <li><i>Postconditions:</i>
+	            <ul>
+	                <li>The <span class="code">WebPage</span> with the indicated URL has been removed from the
+                    graph, <font color="red">and it&#39;s corresponding row and column has been removed from the
+                    adjacency matrix</font>.</li>
+                    <li>All pages that has an index greater than the index that was removed should decrease their
+                    index value by 1.</li>
+                    <li>If <span class="code">url</span> is null or could not be found in <span class="code">pages</span>,
+                    the method ignores the input and does nothing.
+	            </li></ul>
+	        </li><br/>
+
+            <li><i><font color="red">Note:</font></i>
+                <ul>
+                    <li>When the page is removed, it&#39;s corresponding row and column must be removed from the
+                    adjacency matrix. This can be accomplished by copying <span class="code">links[k][j+1]</span> to
+                    <span class="code">links[k][j]</span> and <span class="code">links[j+1][k]</span> to <span class="code">links[j][k]</span>
+                    for <span class="code">0 ≤ k &lt; size(pages)</span> and <span class="code">i ≤ j &lt; size(pages)-1</span>, <font color="red">where <span class="code">i</span> is the index of the WebPage being removed</font>.</li>
+                </ul>
+            </li><br/>
+
+	    </ul>
+	</li>
+
+	<li><span class="code">public void removeLink(String source, String destination)</span>
+		<ul>
+	        <li><i>Brief:</i>
+	            <ul>
+	                <li>Removes the link from <span class="code">WebPage</span> with the URL indicated by
+                    <span class="code">source</span> to the <span class="code">WebPage</span> with the URL
+                    indicated by <span class="code">destination</span>.</li>
+	            </ul>
+	        </li><br/>
+
+            <li><i>Parameters:</i>
+                <ul>
+                    <li><span class="code">source</span> - The URL of the <span class="code">WebPage</span> to remove the link.</li>
+                    <li><span class="code">source</span> - The URL of the link to be removed.</li>
+                </ul>
+            </li><br/>
+
+	        <li><i>Postconditions:</i>
+	            <ul>
+	                <li>The entry in <span class="code">links</span> for the specified hyperlink has been
+                    set to 0 (no link).</li>
+                    <li>If either of the URLs could not be found, the input is ignored and the method does nothing.</li>
+	            </ul>
+	        </li><br/>
+
+	    </ul>
+	</li>
+
+    <li><span class="code">public void updatePageRanks()</span>
+        <ul>
+            <li><i>Brief:</i>
+                <ul>
+                    <li>Calculates and assigns the PageRank for every page in the <span class="code">WebGraph</span>
+                    (see the PageRank Algorithm section for further detail).</li>
+                    <li><span class="comment">Note:</span> This operation should be performed after ANY alteration of the
+                    graph structure (adding/removing a link, adding/removing a page).</li>
+                </ul>
+            </li><br/>
+
+            <li><i>Postconditions:</i>
+                <ul>
+                    <li>All <span class="code">WebPages</span> in the graph have been assigned their proper PageRank.</li>
+                </ul>
+            </li><br/>
+
+        </ul>
+    </li>
+
+	<li><span class="code">public void printTable()</span>
+		<ul>
+	        <li><i>Brief:</i>
+	            <ul>
+	                <li>Prints the <span class="code">WebGraph</span> in tabular form (<i>see sample I/O for more
+                    information</i>).</li>
+	            </ul>
+	        </li><br/>
+
+	    </ul>
+	</li>
+
+</ul>
+</strong></p>
+
+
+<h3>3. SearchEngine</h3>
+<p><strong>Write a fully-documented class named <span class="code">SearchEngine</span> which will initialize a
+<span class="code">WebGraph</span> from the appropriate text files and allow the user to search for keywords in
+the graph. To keep things interesting, the class should provide functionality to add/remove pages to/from the
+graph, as well as alter the hyperlinks between pages in the graph.</strong></p>
+
+<p><strong>On start-up, the <span class="code">SearchEngine</span> should construct a new <span class="code">WebGraph</span>
+using the files indicated by the static constant Strings <span class="code">PAGES_FILE</span> and <span class="code">
+LINKS_FILE</span>. The user should then be presented with a menu allowing them to add a page, remove a page, add a link, remove
+a link, print the graph, search for a keyword, or quit the program. The appropriate operation should be handled depending
+on the selection.</strong></p>
+
+<ul><strong>
+
+    </strong><li><strong>Two constant static <span class="code">String</span> variables:
+        <ul>
+            <li><span class="code">public static final String PAGES_FILE = &quot;pages.txt&quot;</span></li>
+            <li><span class="code">public static final String LINKS_FILE = &quot;links.txt&quot;</span></li>
+        </ul>
+    </strong></li><strong><br/>
+
+	</strong><li><strong>A <span class="code">WebGraph</span> member variable:
+        <ul>
+            <li><span class="code">private WebGraph web</span></li>
+        </ul>
+    </strong></li><strong><br/>
+
+    </strong><li><strong><span class="code">public static void main(String[] args)</span>
+        <ul>
+
+            <li><i>Brief:</i>
+                <ul>
+                    <li>Provide a menu prompt and implement the following menu options:</li>
+                </ul>
+            </li><br/>
+
+        </ul>
+    </strong></li><strong>
+
+</strong></ul>
+
+<ul><strong><span class="code">
+    </span></strong><li><strong>(AP) - Add a new page to the graph.</strong></li><strong>
+    </strong><li><strong>(RP) - Remove a page from the graph.</strong></li><strong>
+    </strong><li><strong>(AL) - Add a link between pages in the graph.</strong></li><strong>
+    </strong><li><strong>(RL) - Remove a link between pages in the graph.</strong></li><strong>
+    </strong><li><strong>
+        (P)  - Print the graph.
+        <ul>
+            <li>(I) Sort based on index (ASC)</li>
+            <li>(U) Sort based on URL (ASC)</li>
+            <li>(R) Sort based on rank (DSC)</li>
+        </ul>
+    </strong></li><strong>
+    </strong><li><strong>(S)  - Search for pages with a keyword.</strong></li><strong>
+    </strong><li><strong>(Q)  - Quit.</strong></li><strong>
+</strong></ul>
+
+<p><strong><font color="red">Note 1</font>: You should make sure that the graph is sorted by <span class="code">index</span> before making
+any changes to the structure (failing to do so will lead to unintended bugs). Also, be sure to update all of the PageRanks for pages after
+any alterations by using the <span class="code">updatePageRanks()</span> method for the graph.<br/>
+<font color="red">Note 2</font>: After choosing the print option, the user should be given another set of menu options.
+Display the results based on the secondary menu option selected.</strong></p>
+
+<h3>4. Comparator</h3>
+
+<p><strong>You will write helper classes that will help you with the sorting. Review the sample
+code (later in the specs) to understand how it is implemented and used. Implement the following classes:</strong></p>
+
+<ul><strong>
+    <span class="code"><span class="comment"> // sort numerically ASCENDING based on index of the WebPage</span><br/>
+    </span></strong><li><strong>public class IndexComparator implements Comparator</strong></li><strong><br/>
+    <span class="code"><span class="comment"> // sort alphabetically ASCENDING based the URL of the WebPage </span><br/>
+    </span></strong><li><strong>public class URLComparator implements Comparator</strong></li><strong><br/>
+    <span class="code"><span class="comment"> // sort numerically DESCENDING based on the PageRank of the WebPage</span><br/>
+    </span></strong><li><strong>public class RankComparator implements Comparator</strong></li><strong><br/>
+</strong></ul>
+
+<p><b><u>SAMPLE COMPARABLE CODE:</u></b></p>
+
+<b><pre class="code">import java.util.*;
+
+<span class="comment">/*
+ * An example of type abstraction that implements Comparable
+ * and Comparator interfaces.
+ *
+ * The Comparable/Comparator interfaces provide a standard means
+ * for communication with yet unknown types of objects.
+*/</span>
+
+public class CollectionsTester {
+         public static void main(String[] args) {
+           ArrayList staff = new ArrayList();
+
+           staff.add(new Employee(&quot;Joe&quot;,100000, 177700010));
+           staff.add(new Employee(&quot;Jane&quot;,200000, 111100010));
+           staff.add(new Employee(&quot;Bob&quot;,66666, 1999000010));
+           staff.add(new Employee(&quot;Andy&quot;,77777, 188800010));
+
+           Collections.sort(staff);                                      <span class="comment">// Sort by salary</span>
+           System.out.println(&quot;Lowest paid employee: &quot;+staff.get(0));    <span class="comment">// Prints Bob</span>
+
+           Collections.sort(staff, new NameComparator());                <span class="comment">// Sort by alphabetical order</span>
+           System.out.println(&quot;First employee in list: &quot;+staff.get(0));  <span class="comment">// Prints Andy</span>
+
+           Collections.sort(staff, new IdComparator());                  <span class="comment">// Sort by ID number</span>
+           System.out.println(&quot;Employee with lowest ID: &quot;+staff.get(0)); <span class="comment">// Prints Jane</span>
+         }
+}
+
+public class Employee implements Comparable {
+        private String name;
+        private int salary;
+        private int id;
+        public Employee(String initName, int initSal, int initId) {
+                id     = initId;
+                name = initName;
+                salary = initSal;
+        }
+        public String getName(){ return name; }
+        public int getSalary() { return salary; }
+        public int getId(){ return id; }
+        public void setSalary(int newSalary) {
+                salary = newSalary;
+        }
+        public int compareTo(Object o) {
+                Employee otherEmp = (Employee)o;
+                if (this.salary == otherEmp.salary)
+                        return 0;
+                else if (this.salary &gt; otherEmp.salary)
+                        return 1;
+                else
+                        return -1;
+        }
+        public String toString() {
+                return name + &quot;, $&quot; + salary + &quot;, &quot;+ id;
+        }
+}
+
+public class NameComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+                Employee e1 = (Employee) o1;
+                Employee e2 = (Employee) o2;
+                return (e1.getName().compareTo(e2.getName()));
+        }
+}
+
+public class IdComparator implements Comparator {
+       public int compare(Object o1, Object o2) {
+           Employee e1 = (Employee) o1;
+           Employee e2 = (Employee) o2;
+           if (e1.getId() == e2.getId())
+               return 0;
+           else if (e1.getId() &gt; e2.getId())
+               return 1;
+           else
+               return -1;
+       }
+}
+</pre></b>
+
+<hr size="2" width="100%" align="center"/>
+
+<h3>Reading Graph from File:</h3>
+
+<p><b><span class="code"><a rel="noopener" href="http://www.cs.stonybrook.edu/~cse214/hw/hw7-images/pages.txt">pages.txt</a></span> will contain information related to a single
+<span class="code">WebPage</span> on each line in the following format:
+<pre>
+<span class="comment">// name keyword1 keyword2 ... keywordN</span>
+    google.com search knowledge tech
+    stonybrook.edu university seawolf knowledge journalism
+    cnn.com news current world journalism
+    facebook.com social friends tech
+    youtube.com video music cats tech
+    wikipedia.org knowledge encyclopedia
+    stackoverflow.com forum knowledge social
+</pre>
+</b></p>
+
+
+<p><b><span class="code"><a rel="noopener" href="http://www.cs.stonybrook.edu/~cse214/hw/hw7-images/links.txt">links.txt</a></span> will contain a hyperlink on each line in the following format:
+<pre>
+<span class="comment">// source destination</span>
+    google.com stonybrook.edu
+    google.com cnn.com
+    google.com facebook.com
+    google.com youtube.com
+    google.com wikipedia.org
+    google.com stackoverflow.com
+    stonybrook.edu google.com
+    stonybrook.edu cnn.com
+    cnn.com facebook.com
+    facebook.com google.com
+    facebook.com cnn.com
+    facebook.com youtube.com
+    youtube.com facebook.com
+    stackoverflow.com wikipedia.org
+</pre>
+
+<p><b>When constructing the graph, you should first insert all of the web pages into the <span class="code">pages</span>
+Collection in the <span class="code">WebGraph</span> object. Then, after all pages have been inserted into the graph,
+read each of the links and add them to the <span class="code">links</span> adjacency matrix. This will ensure that you
+do not attempt to add and link between pages before adding either of the pages to the graph.</b></p>
+
+<p><b>You may use the following code to open an input stream for reading from a text file:</b></p>
+
+<b>
+<pre>    FileInputStream fis = new FileInputStream(fileName);
+
+    InputStreamReader inStream = new InputStreamReader(fis);
+
+    BufferedReader reader = new BufferedReader(inStream);
+</pre>
+</b>
+
+<p><strong>Once the stream is open, you can read one line at a time as follows:</strong></p>
+
+<b>
+<pre>
+     String data = reader.readLine();
+</pre>
+</b>
+
+<p><strong>You can also create the reader using a scanner:</strong></p>
+
+<b>
+<pre>
+     Scanner scanner = new Scanner(new File(<span style="color:blue;">fileName</span>));
+</pre>
+</b>
+
+<p><b>Check the documentation for <a rel="noopener" href="http://docs.oracle.com/javase/7/docs/api/java/io/BufferedReader.html" target="_blank">BufferedReader</a> or
+<a rel="noopener" href="http://docs.oracle.com/javase/7/docs/api/java/util/Scanner.html" target="_blank">Scanner</a>.</b></p>
+
+<hr size="2" width="100%" align="center"/>
+
+<h2>Page Rank Algorithm</h2>
+
+<p><b>PageRank is an algorithm developed by Larry Page (of Google fame) to attempt to order web pages based on relevance. The idea
+is very simple - the more hyperlinks pointing to a page, the more &quot;popular&quot; that page is in the web graph, and the more relevant the
+page is (note that this is an extremely simplified version - the actual algorithm involves many more complex operations to implement
+this basic idea). In this assignment, you will implement PageRank in it&#39;s most basic form - the rank of a WebPage is equal to the number
+of directed edges pointing <i>towards</i> the page in the <span class="code">WebGraph</span>.</b></p>
+
+<p><b>When a user enters a keyword, the program should look through all the <span class="code">WebPages</span> in the
+<span class="code">WebGraph</span> to find which ones are tagged with the keyword, and add them to a list. After all of the
+<span class="code">WebPages</span> have been added, they should be sorted according to their PageRank in a descending fashion (ties can
+be broken arbitrarily). Note
+that the PageRank of <span class="code"> WebPage</span> &#39;p&#39; can be easily calculated by adding all of the entries in the column &#39;i&#39; of
+the adjacency matrix  <span class="code">links</span>, where &#39;i&#39; is the index of &#39;p&#39; in the <span class="code">pages</span> Collection.
+For example, the PageRank of &quot;wikipedia.org&quot; in the graph below would be calculated by summing the 5&#39;th column of the adjacency matrix,
+which would yield a PageRank of 2.
+</b></p>
+
+<figure style="text-align:center;">
+  <img src="http://www.cs.stonybrook.edu/~cse214/hw/hw7-images/pagerank.jpg" alt="Directed Graph with Adjacency Matrix"/><br/>
+  <figcaption><b>PageRank of &quot;wikipedia.org&quot; is 2.</b></figcaption>
+</figure>
+<br/>
+
+<p><b>After all the pages have been added and sorted, the URLs should be printed to the console. To make sure that the algorithm is
+working correctly, you should print out the total ranking (e.g. &#39;1&#39; for the highest PageRank, &#39;2&#39; for the second highest, etc.) as
+well as the actual PageRank value along with the URLs in tabular form.</b></p>
+
+<hr size="2" width="100%" align="center"/>
+
+<h2>GUI EXTRA CREDIT (OPTIONAL):</h2>
+
+<p><b>In addition to performing all the functions described
+above, the GUI must have clickable headers on all lists which sort by that
+column when clicked. Clicking again on that column should reverse the sorting order.  </b><span></span></p>
+
+
+
+<hr size="2" width="100%" align="center"/>
+
+<h2>Sample Input/Output:</h2>
+
+<p><span class="comment">// Comment in green, </span><span class="input">input in red,
+</span>output in black</p>
+
+<div style="font-size:16;" class="code"><strong>
+
+<pre>
+<span class="comment">// Load WebGraph from file. PageRanks should be calculated and initialized.</span>
+Loading WebGraph data...
+Success!
+
+Menu:
+    (AP) - Add a new page to the graph.
+    (RP) - Remove a page from the graph.
+    (AL) - Add a link between pages in the graph.
+    (RL) - Remove a link between pages in the graph.
+    (P)  - Print the graph.
+    (S)  - Search for pages with a keyword.
+    (Q)  - Quit.
+
+Please select an option: <span class="input">P</span>
+
+    (I) Sort based on index (ASC)
+    (U) Sort based on URL (ASC)
+    (R) Sort based on rank (DSC)
+
+Please select an option: <span class="input">I</span>
+
+Index     URL               PageRank  Links               Keywords
+------------------------------------------------------------------------------------------------------
+  0   | google.com         |    2    | 1, 2, 3, 4, 5, 6  | search, knowledge, tech
+  1   | stonybrook.edu     |    1    | 0, 2              | university, seawolf, knowledge, journalism
+  2   | cnn.com            |    3    | 3                 | news, current, world, journalism
+  3   | facebook.com       |    3    | 0, 2, 4           | social, friends, tech
+  4   | youtube.com        |    2    | 3                 | video, music, cats, tech
+  5   | wikipedia.org      |    2    |                   | knowledge, encyclopedia
+  6   | stackoverflow.com  |    1    | 5                 | forum, knowledge, social
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">S</span>
+Search keyword: <span class="input">knowledge</span>
+
+Rank   PageRank    URL
+---------------------------------------------
+  1  |    2     | google.com
+  2  |    2     | wikipedia.org
+  3  |    1     | stonybrook.edu
+  4  |    1     | stackoverflow.com
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">AL</span>
+Enter a source URL: <span class="input">wikipedia.org</span>
+Enter a destination URL: <span class="input">stonybrook.edu</span>
+
+Link successfully added from wikipedia.org to stonybrook.edu!
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">AL</span>
+Enter a source URL: <span class="input">stackoverflow.com</span>
+Enter a destination URL: <span class="input">stonybrook.edu</span>
+
+Link successfully added from stackoverflow.com to stonybrook.edu!
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">P</span>
+
+<span class="comment">// Sub-menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">I</span>
+
+Index     URL               PageRank  Links               Keywords
+---------------------------------------------------------------------------------------------------
+  0   | google.com         |    2    | 1, 2, 3, 4, 5, 6  | search, knowledge, tech
+  1   | stonybrook.edu     |    3    | 0, 2              | university, seawolf, knowledge, journalism
+  2   | cnn.com            |    3    | 3                 | news, current, world, journalism
+  3   | facebook.com       |    3    | 0, 2, 4           | social, friends, tech
+  4   | youtube.com        |    2    | 3                 | video, music, cats, tech
+  5   | wikipedia.org      |    2    | 1                 | knowledge, encyclopedia
+  6   | stackoverflow.com  |    1    | 1, 5              | forum, knowledge, social
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">S</span>
+Search keyword: <span class="input">knowledge</span>
+
+Rank   PageRank    URL
+---------------------------------------------
+  1  |    3     | stonybrook.edu
+  2  |    2     | google.com
+  3  |    2     | wikipedia.org
+  4  |    1     | stackoverflow.com
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">AP</span>
+Enter a URL: <span class="input">tumblr.com</span>
+Enter keywords (space-separated): <span class="input">blog art social friends</span>
+
+tumblr.com successuflly added to the WebGraph!
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">AL</span>
+Enter a source URL: <span class="input">facebook.com</span>
+Enter a destination URL: <span class="input">tumblr.com</span>
+
+Link successfully added from facebook.com to tumblr.com!
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">P</span>
+
+<span class="comment">// Submenu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">I</span>
+
+Index     URL               PageRank  Links               Keywords
+---------------------------------------------------------------------------------------------------
+  0   | google.com         |    2    | 1, 2, 3, 4, 5, 6  | search, knowledge, tech
+  1   | stonybrook.edu     |    3    | 0, 2              | university, seawolf, knowledge, journalism
+  2   | cnn.com            |    3    | 3                 | news, current, world, journalism
+  3   | facebook.com       |    3    | 0, 2, 4, 7        | social, friends, tech
+  4   | youtube.com        |    2    | 3                 | video, music, cats, tech
+  5   | wikipedia.org      |    2    | 1                 | knowledge, encyclopedia
+  6   | stackoverflow.com  |    1    | 1, 5              | forum, knowledge, social
+  7   | tumblr.com         |    1    |                   | blog, art, social, friends
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">S</span>
+Search keyword: <span class="input">social</span>
+
+Rank   PageRank    URL
+---------------------------------------------
+  1  |    3     | facebook.com
+  2  |    1     | tumblr.com
+  3  |    1     | stackoverflow.com
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">S</span>
+Search keyword: <span class="input">news</span>
+
+Rank   PageRank    URL
+---------------------------------------------
+  1  |    3     | cnn.com
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">RL</span>
+Enter a source URL: <span class="input">google.com</span>
+Enter a destination URL: <span class="input">cnn.com</span>
+
+Link removed from google.com to cnn.com!
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">S</span>
+Search keyword: <span class="input">news</span>
+
+Rank   PageRank    URL
+---------------------------------------------
+  1  |    2     | cnn.com
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">RP</span>
+Enter a URL: <span class="input">youtube.com</span>
+
+youtube.com has been removed from the graph!
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">P</span>
+
+<span class="comment">// Submenu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">I</span>
+
+<span class="comment">// Note that the link numbers have changed for indices &gt; 4.</span>
+
+Index     URL               PageRank  Links               Keywords
+---------------------------------------------------------------------------------------------------
+  0   | google.com         |    2    | 1, 3, 4, 5        | search, knowledge, tech
+  1   | stonybrook.edu     |    3    | 0, 2              | university, seawolf, knowledge, journalism
+  2   | cnn.com            |    2    | 3                 | news, current, world, journalism
+  3   | facebook.com       |    2    | 0, 2, 6           | social, friends, tech
+  4   | wikipedia.org      |    2    | 1                 | knowledge, encyclopedia
+  5   | stackoverflow.com  |    1    | 1, 4              | forum, knowledge, social
+  6   | tumblr.com         |    1    |                   | blog, art, social, friends
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">P</span>
+
+<span class="comment">// Submenu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">U</span>
+
+Index     URL               PageRank   Links               Keywords
+-------------------------------------------------------------------------------------------------------------
+  2   | cnn.com            |    2    | 3                 | news, current, world, journalism
+  3   | facebook.com       |    2    | 0, 2, 6           | social, friends, tech
+  0   | google.com         |    2    | 1, 3, 4, 5        | search, knowledge, tech
+  5   | stackoverflow.com  |    1    | 1, 4              | forum, knowledge, social
+  1   | stonybrook.edu     |    3    | 0, 2              | university, seawolf, knowledge, journalism
+  6   | tumblr.com         |    1    |                   | blog, art, social, friends
+  4   | wikipedia.org      |    2    | 1                 | knowledge, encyclopedia
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">P</span>
+
+<span class="comment">// Submenu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">R</span>
+
+Index     URL               PageRank  Links               Keywords
+-------------------------------------------------------------------------------------------------------
+  1   | stonybrook.edu     |    3    | 0, 2              | university, seawolf, knowledge, journalism
+  0   | google.com         |    2    | 1, 3, 4, 5        | search, knowledge, tech
+  2   | cnn.com            |    2    | 3                 | news, current, world, journalism
+  3   | facebook.com       |    2    | 0, 2, 6           | social, friends, tech
+  4   | wikipedia.org      |    2    | 1                 | knowledge, encyclopedia
+  5   | stackoverflow.com  |    1    | 1, 4              | forum, knowledge, social
+  6   | tumblr.com         |    1    |                   | blog, art, social, friends
+
+
+<span class="comment">// Special Cases:</span>
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">S</span> <span class="comment">// Searching for non existent keyword.</span>
+Search keyword: <span class="input">dogs</span>
+
+No search results found for the keyword dogs.
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">AP</span> <span class="comment">// Duplicate URLs.</span>
+Enter a URL: <span class="input">facebook.com</span>
+Enter keywords (space-separated): <span class="input">social friends tech</span>
+
+Error: facebook.com already exists in the WebGraph. Could not add new WepPage.
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">AL</span> <span class="comment">// Non-existent URLs.</span>
+Enter a source URL: <span class="input">instagram.com</span>
+Enter a destination URL: <span class="input">facebook.com</span>
+
+Error: instagram.com could not be found in the WebGraph.
+
+<span class="comment">// Menu not printed in sample I/O.</span>
+
+Please select an option: <span class="input">Q</span>
+
+Goodbye.
+
+</pre>
+
+</strong>
+
+</div>
+
+<strong></strong></b></p></div>
+
+<hr size="2" width="100%" align="center"/>
+
+<p align="center" style="text-align:center;"><strong><span style="font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;color:maroon;"><a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/courseinfo.htm" target="_blank">Course Info</a> | <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/schedule.htm" target="_blank">Schedule</a> | <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/sections.htm" target="_blank">Sections</a> | <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/index.html" target="_blank">Announcements</a> | <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/homework.htm" target="_blank">Homework</a> | <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/exams.htm" target="_blank">Exams</a> | <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/help.htm" target="_blank">Help/FAQ</a> | <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/grades.htm" target="_blank">Grades</a> | <a rel="noopener" href="http://www.cs.sunysb.edu/~cse214/index.html" target="_blank">HOME</a></span></strong><b> </b></p>
+
+</div>
+
+
+<script type="module" src="https://s.brightspace.com/lib/bsi/20.22.11-198/unbundled/mathjax.js"></script><script type="text/javascript">document.addEventListener('DOMContentLoaded', function() {
+					if (document.querySelector('math') || /\$\$|\\\(|\\\[|\\begin{|\\ref{|\\eqref{/.test(document.body.innerHTML)) {
+						document.querySelectorAll('mspace[linebreak="newline"]').forEach(elm => {
+							elm.setAttribute('style', 'display: block; height: 0.5rem;');
+						});
+
+						window.D2L.MathJax.loadMathJax({
+							'outputScale': 1.3,
+							'renderLatex': true
+						});
+					}
+				});</script><script type="module" src="https://s.brightspace.com/lib/bsi/20.22.11-198/unbundled/prism.js"></script><script type="text/javascript">document.addEventListener('DOMContentLoaded', function() {
+					document.querySelectorAll('.d2l-code').forEach(code => {
+						window.D2L.Prism.formatCodeElement(code);
+					});
+				});</script></body></html>
